@@ -1,9 +1,15 @@
 <script>
+  import { onMount } from "svelte";
+
   let toastLevel = 3; // Default toast level
   let toasting = false;
   let toastCount = 0;
   let remainingTime = 0;
   let selectedItem = 'Bread';
+  let countdownInterval;
+  let progress = 0; // Progress bar starts at 0%
+  let elapsedTime = 0; // Track elapsed time
+  let targetLevel = toastLevel;
 
   // Item options for the toaster
   const items = ['Bread', 'Bagel', 'Waffle', 'Pastry'];
@@ -44,16 +50,50 @@
     }
   };
 
+  // Function to start toasting and begin countdown
   const startToasting = () => {
-    toasting = true;
-    remainingTime = toastLevel * 30; // Simulated time based on level
+    if (!toasting) {
+      toasting = true;
+      remainingTime = toastLevel * 30; // Simulated time based on toast level
+      const totalTime = remainingTime;
+      elapsedTime = 0; // Reset elapsed time
+      targetLevel = toastLevel;
+      toastLevel = 1;
+
+      countdownInterval = setInterval(() => {
+        if (elapsedTime < totalTime) {
+          elapsedTime++;
+          progress = (elapsedTime / totalTime) * 100; // Update progress
+        } else {
+          stopToasting(); // Stop once elapsedTime reaches totalTime
+        }
+        if (targetLevel != toastLevel && elapsedTime % 30 === 0) {
+          toastLevel++;
+        }
+      }, 1000); // Increment every second
+    }
   };
 
+  // Function to stop toasting and clear countdown
   const stopToasting = () => {
-    toasting = false;
-    remainingTime = 0;
-    toastCount++;
+    if (toasting) {
+      toasting = false;
+      clearInterval(countdownInterval);
+      progress = 0; // Reset progress bar
+      remainingTime = 0;
+      elapsedTime = 0;
+      toastCount++;
+    }
   };
+
+  // This reactive block resets the remaining time whenever toasting is stopped or toast level changes
+  $: {
+    if (!toasting) {
+      remainingTime = toastLevel * 30; // Simulated time based on level
+      progress = 0; // Reset progress when not toasting
+      elapsedTime = 0; // Reset elapsed time
+    }
+  }
 </script>
 
 <div class="page">
@@ -92,12 +132,18 @@
 
     <!-- Toasting controls -->
     <div>
-      <p>Time Remaining: {remainingTime} seconds</p>
+      <p>Time Remaining: {remainingTime - elapsedTime} seconds</p>
     </div>
     <div>
       <button on:click={startToasting}>Start Toasting</button>
       <button on:click={stopToasting}>Stop Toasting</button>
     </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar" style="width: {progress}%"></div>
+    </div>
+
     <p>Toasts made today: {toastCount}</p>
   </div>
   
@@ -150,5 +196,21 @@
 
   input[type="range"] {
     width: 100%;
+  }
+
+  /* Progress bar styling */
+  .progress-bar-container {
+    width: 100%;
+    height: 20px;
+    background-color: #f3f3f3;
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background-color: #4caf50;
+    transition: width 1s linear; /* Smooth transition over 1 second */
   }
 </style>
