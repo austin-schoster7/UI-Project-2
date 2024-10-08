@@ -25,12 +25,12 @@
       6: 'bread-burnt.png'
     },
     Bagel: {
-      1: 'bagel-1.png',
-      2: 'bagel-2.png',
-      3: 'bagel-3.png',
-      4: 'bagel-4.png',
-      5: 'bagel-5.png',
-      6: 'bagel-6.png'
+      1: 'bagel.jpg',
+      2: 'bagel-slightly-toasted.png',
+      3: 'bagel-moderately-toasted.png',
+      4: 'bagel-well-toasted.png',
+      5: 'bagel-very-well-toasted.png',
+      6: 'bagel-burnt.png'
     },
     Waffle: {
       1: 'waffle-1.png',
@@ -100,7 +100,12 @@
   <!-- Device UI -->
   <div class="device-ui">
     <h2>Smart Toaster</h2>
+    <h3>Austin Schoster, Skyler Simpson, Joe Schnizer, Sam Winkelmann</h3>
+    <a href="https://sites.google.com/view/austin-schoster/cs5167-projects">Link to write up</a>
     
+    <br>
+    <br>
+
     <!-- Item selection dropdown -->
     <div>
       <label>Select Item to Toast: </label>
