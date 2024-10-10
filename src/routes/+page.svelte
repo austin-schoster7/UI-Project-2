@@ -1,5 +1,6 @@
 <script>
   import { onMount } from "svelte";
+  import Modal from './Modal.svelte';
 
   let toastLevel = 3; // Default toast level
   let toasting = false;
@@ -13,6 +14,23 @@
 
   // Item options for the toaster
   const items = ['Bread', 'Bagel', 'Waffle', 'Pastry'];
+
+  // Mock user profiles with favorite and previous settings
+  const profiles = {
+    'Alice': {
+      favorite: { item: 'Bread', toastLevel: 4 },
+      previous: { item: 'Bagel', toastLevel: 3 }
+    },
+    'Bob': {
+      favorite: { item: 'Waffle', toastLevel: 5 },
+      previous: { item: 'Pastry', toastLevel: 2 }
+    }
+  };
+
+  let selectedUser = ''; // No user selected by default
+
+  // Modal control variables
+  let showModal = false;
 
   // Mapping item names to their images for each toast level (1-6)
   const itemImages = {
@@ -86,7 +104,38 @@
     }
   };
 
-  // This reactive block resets the remaining time whenever toasting is stopped or toast level changes
+  // Load profile settings based on user selection
+  const loadProfile = () => {
+    if (selectedUser) {
+      showModal = true; // Show the modal
+    }
+  };
+
+  const closeModal = () => {
+    showModal = false;
+  };
+
+  const loadFavoriteSettings = () => {
+    const favorite = profiles[selectedUser].favorite;
+    selectedItem = favorite.item;
+    toastLevel = favorite.toastLevel;
+    showModal = false;
+  };
+
+  const loadPreviousSettings = () => {
+    const previous = profiles[selectedUser].previous;
+    selectedItem = previous.item;
+    toastLevel = previous.toastLevel;
+    showModal = false;
+  };
+
+  const loadBlankSettings = () => {
+    selectedItem = 'Bread';
+    toastLevel = 3;
+    showModal = false;
+  };
+
+  // Reactive block to reset remaining time, progress, etc.
   $: {
     if (!toasting) {
       remainingTime = toastLevel * 30; // Simulated time based on level
@@ -103,8 +152,18 @@
     <h3>Austin Schoster, Skyler Simpson, Joe Schnizer, Sam Winkelmann</h3>
     <a href="https://sites.google.com/view/austin-schoster/cs5167-projects">Link to write up</a>
     
-    <br>
-    <br>
+    <br><br>
+
+    <!-- User profile selection -->
+    <div class="profile-section">
+      <label>Select User: </label>
+      <select bind:value={selectedUser} on:change={loadProfile}>
+        <option value="">Select a user</option>
+        {#each Object.keys(profiles) as user}
+          <option value={user}>{user}</option>
+        {/each}
+      </select>
+    </div>
 
     <!-- Item selection dropdown -->
     <div>
@@ -132,6 +191,7 @@
         max="6"
         bind:value={toastLevel}
         step="1"
+        style="--value: {(toastLevel - 1) / 5}"
       />
     </div>
 
@@ -166,56 +226,185 @@
   </div>
 </div>
 
+<!-- Modal for Profile Settings -->
+<Modal bind:show={showModal} title="Load Settings for {selectedUser}" onClose={closeModal}>
+  <p>Select settings to load:</p>
+  <div class="modal-buttons">
+    <button on:click={loadFavoriteSettings}>Favorite</button>
+    <button on:click={loadPreviousSettings}>Previous</button>
+    <button on:click={loadBlankSettings}>Blank</button>
+  </div>
+</Modal>
+
 <style>
+  /* General Page Layout */
   .page {
     display: flex;
     justify-content: space-around;
-  }
-
-  .device-ui, .testing-ui {
-    border: 1px solid #ccc;
+    background-color: #f0f0f5; /* Light background color for a modern look */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
+    height: 100vh;
   }
 
+  /* Device UI Container */
   .device-ui {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
     width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
-  img {
-    width: 150px;
-  }
-
-  .display-section {
-    margin-top: 20px;
+  /* Testing UI Container */
+  .testing-ui {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 25%;
     text-align: center;
   }
 
-  .item-outline {
-    width: 100px;
-    height: auto;
+  /* Headers */
+  h2 {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
   }
 
+  h3 {
+    color: #444;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  /* Item Selection Dropdown */
+  select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    width: 100%;
+    margin-bottom: 20px;
+    transition: border 0.3s;
+  }
+
+  select:hover {
+    border-color: #007bff;
+  }
+
+  /* Toasting Item Image */
+  .display-section {
+    margin-top: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .item-outline {
+    width: 120px;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 8px;
+  }
+
+  /* Toast Level Slider */
   .toast-level {
     margin-top: 20px;
+    width: 100%;
+    text-align: left;
   }
 
   input[type="range"] {
     width: 100%;
+    margin-top: 5px;
+    appearance: none;
+    height: 8px;
+    background: linear-gradient(
+      to right,
+      #007bff 0%,
+      #007bff calc(var(--value) * 100%),
+      #ddd calc(var(--value) * 100%),
+      #ddd 100%
+    );
+    border-radius: 5px;
+    outline: none;
   }
 
-  /* Progress bar styling */
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background-color: #007bff;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: #007bff;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  /* Progress Bar */
   .progress-bar-container {
     width: 100%;
     height: 20px;
-    background-color: #f3f3f3;
-    margin-top: 20px;
+    background-color: #e0e0e0;
     border-radius: 10px;
     overflow: hidden;
+    margin-top: 20px;
+    position: relative;
   }
 
   .progress-bar {
     height: 100%;
-    background-color: #4caf50;
-    transition: width 1s linear; /* Smooth transition over 1 second */
+    background-color: #28a745;
+    transition: width 1s linear;
+    border-radius: 10px;
+  }
+
+  /* Buttons */
+  button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+  }
+
+  button:active {
+    background-color: #004494;
+  }
+
+  /* Responsive Layout */
+  @media (max-width: 768px) {
+    .page {
+      flex-direction: column;
+    }
+
+    .device-ui, .testing-ui {
+      width: 100%;
+      margin-bottom: 20px;
+    }
   }
 </style>
+
