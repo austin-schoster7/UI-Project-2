@@ -11,6 +11,9 @@
   let progress = 0; // Progress bar starts at 0%
   let elapsedTime = 0; // Track elapsed time
   let targetLevel = toastLevel;
+  let reheatTimer = 0;
+  let reheatActive = false;
+  let reheatModeTime = 0;
 
   // Item options for the toaster
   const items = ['Bread', 'Bagel', 'Waffle', 'Pastry'];
@@ -84,6 +87,7 @@
           progress = (elapsedTime / totalTime) * 100; // Update progress
         } else {
           stopToasting(); // Stop once elapsedTime reaches totalTime
+          startReheatCountdown(); // Start the reheat countdown when toasting stops
         }
         if (targetLevel != toastLevel && elapsedTime % 30 === 0) {
           toastLevel++;
@@ -133,6 +137,29 @@
     selectedItem = 'Bread';
     toastLevel = 3;
     showModal = false;
+  };
+
+  const startReheatCountdown = () => {
+    reheatTimer = 30; // 30 seconds to remove toast
+    const reheatInterval = setInterval(() => {
+      if (reheatTimer > 0) {
+        reheatTimer--;
+      } else {
+        clearInterval(reheatInterval);
+        activateReheatMode(); // Trigger reheat mode if toast is not removed
+      }
+    }, 1000);
+  };
+
+  const removeToast = () => {
+    reheatTimer = 0; // Cancel reheat countdown
+    reheatActive = false; // Disable reheat mode if active
+    progress = 0; // Reset progress when toast is removed
+  };
+
+  const activateReheatMode = () => {
+    reheatActive = true;
+    progress = 100; // Indicate the toast is fully done in reheat mode
   };
 
   // Reactive block to reset remaining time, progress, etc.
@@ -206,8 +233,19 @@
 
     <!-- Progress Bar -->
     <div class="progress-bar-container">
-      <div class="progress-bar" style="width: {progress}%"></div>
+      <div class="progress-bar {reheatActive ? 'reheat-mode' : ''}" style="width: {progress}%"></div>
     </div>
+
+    <!-- Reheat Mode and Toast Removal -->
+    {#if reheatTimer > 0}
+      <p>Reheat mode starting in {reheatTimer} seconds</p>
+      <button on:click={removeToast}>Remove Toast</button>
+    {/if}
+
+    {#if reheatActive}
+      <p>Reheat Mode Active. Toast will stay warm until removed.</p>
+      <button on:click={removeToast}>Remove Toast</button>
+    {/if}
 
     <p>Toasts made today: {toastCount}</p>
   </div>
@@ -372,6 +410,24 @@
     background-color: #28a745;
     transition: width 1s linear;
     border-radius: 10px;
+  }
+
+  /* Flashing red animation for reheat mode */
+  @keyframes flashRed {
+    0% {
+      background-color: #ff4d4d; /* Light red */
+    }
+    50% {
+      background-color: #ff9999; /* Lighter red */
+    }
+    100% {
+      background-color: #ff4d4d; /* Light red */
+    }
+  }
+
+  /* Apply the flashing red animation in reheat mode */
+  .reheat-mode {
+    animation: flashRed 1s infinite; /* Flash every second */
   }
 
   /* Buttons */
