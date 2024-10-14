@@ -54,20 +54,20 @@
       6: 'bagel-burnt.png'
     },
     Waffle: {
-      1: 'waffle-1.png',
-      2: 'waffle-2.png',
-      3: 'waffle-3.png',
-      4: 'waffle-4.png',
-      5: 'waffle-5.png',
-      6: 'waffle-6.png'
+      1: 'waffle.png',
+      2: 'waffle-slightly-toasted.png',
+      3: 'waffle-moderately-toasted.png',
+      4: 'waffle-well-toasted.png',
+      5: 'waffle-very-well-toasted.png',
+      6: 'waffle-burnt.png'
     },
     Pastry: {
-      1: 'pastry-1.png',
-      2: 'pastry-2.png',
-      3: 'pastry-3.png',
-      4: 'pastry-4.png',
-      5: 'pastry-5.png',
-      6: 'pastry-6.png'
+      1: 'pastry.png',
+      2: 'pastry-slightly-toasted.png',
+      3: 'pastry-moderately-toasted.png',
+      4: 'pastry-well-toasted.png',
+      5: 'pastry-very-well-toasted.png',
+      6: 'pastry-burnt.png'
     }
   };
 
