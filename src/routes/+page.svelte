@@ -72,9 +72,9 @@
   };
 
   // Function to start toasting and begin countdown
-  const startToasting = () => {
+  const startStopToasting = () => {
     if (!toasting) {
-      toasting = true;
+      toasting = !toasting;
       remainingTime = toastLevel * 30; // Simulated time based on toast level
       const totalTime = remainingTime;
       elapsedTime = 0; // Reset elapsed time
@@ -94,12 +94,15 @@
         }
       }, 1000); // Increment every second
     }
+    else {
+      stopToasting();
+    }
   };
 
   // Function to stop toasting and clear countdown
   const stopToasting = () => {
     if (toasting) {
-      toasting = false;
+      toasting = !toasting;
       clearInterval(countdownInterval);
       progress = 0; // Reset progress bar
       remainingTime = 0;
@@ -205,7 +208,8 @@
     <!-- Display area for selected item outline -->
     <div class="display-section">
       <h3>Toasting: {selectedItem}</h3>
-      <img src={itemImages[selectedItem][toastLevel]} alt="{selectedItem} at toast level {toastLevel}" class="item-outline" />
+      <button class={!toasting ? 'startButton' : 'stopButton'} on:click={startStopToasting}>
+      <img src={itemImages[selectedItem][toastLevel]} alt="{selectedItem} at toast level {toastLevel}" class="item-outline" /><br>
     </div>
 
     <!-- Toast level slider -->
@@ -227,8 +231,6 @@
       <p>Time Remaining: {remainingTime - elapsedTime} seconds</p>
     </div>
     <div>
-      <button on:click={startToasting}>Start Toasting</button>
-      <button on:click={stopToasting}>Stop Toasting</button>
     </div>
 
     <!-- Progress Bar -->
@@ -253,7 +255,7 @@
   <!-- Testing UI -->
   <div class="testing-ui">
     <h2>Testing Controls</h2>
-    <button on:click={startToasting}>Simulate Start</button>
+    <button on:click={startStopToasting}>Simulate Start</button>
     <button on:click={stopToasting}>Simulate Stop</button>
     <button on:click={() => alert('Info about controls...')}>Info</button>
   </div>
@@ -449,6 +451,38 @@
 
   button:active {
     background-color: #004494;
+  }
+
+  .startButton {
+    background-color: rgb(0, 181, 0);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+
+  .startButton:hover {
+    background-color: rgb(0, 129, 0);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+  }
+
+  .stopButton {
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+
+  .stopButton:hover {
+    background-color: rgb(183, 0, 0);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
   }
 
   /* Responsive Layout */
