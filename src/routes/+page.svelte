@@ -3,6 +3,7 @@
   import Modal from './Modal.svelte';
 
   let toastLevel = 3; // Default toast level
+  let toastDecimal = 0;
   let toasting = false;
   let toastCount = 0;
   let remainingTime = 0;
@@ -71,8 +72,11 @@
     }
   };
 
+  let increaseOpacityCounter = 0;
+  let imageOpacity = 0;
   // Function to start toasting and begin countdown
   const startToasting = () => {
+    document.getElementById("top-image").style.opacity = 0;
     if (!toasting) {
       toasting = true;
       remainingTime = toastLevel * 30; // Simulated time based on toast level
@@ -91,6 +95,13 @@
         }
         if (targetLevel != toastLevel && elapsedTime % 30 === 0) {
           toastLevel++;
+        }
+
+        increaseOpacityCounter++;
+        if(totalTime/increaseOpacityCounter == 10){
+          imageOpacity += .066;
+          document.getElementById("top-image").style.opacity = imageOpacity;
+          increaseOpacityCounter = 0;
         }
       }, 1000); // Increment every second
     }
@@ -155,6 +166,7 @@
     reheatTimer = 0; // Cancel reheat countdown
     reheatActive = false; // Disable reheat mode if active
     progress = 0; // Reset progress when toast is removed
+    document.getElementById("top-image").src = "transparent.png";
   };
 
   const activateReheatMode = () => {
@@ -170,6 +182,47 @@
       elapsedTime = 0; // Reset elapsed time
     }
   }
+
+  const updateToastLevel = (event) =>{
+    toastDecimal = event.target.value - Math.floor(event.target.value);
+    toastLevel = Math.floor(event.target.value);
+  }
+
+  const colorA = [
+    [255, 255, 255], //White
+    [239, 228, 176], //slightly
+    [242, 160, 114], //moderately
+    [185, 122, 87], //well
+    [79, 52, 38], //very well
+    [0, 0, 0] //burnt
+  ]
+  let mixedColor = "#B97A57";
+  $: {
+    if (toastLevel == 1 && toastDecimal == 0){
+      mixedColor = colorA[toastLevel-1];
+    }
+    else if (toastLevel == 6){
+      mixedColor = colorA[toastLevel-1];
+    }
+    else{
+      let mixedR = colorA[toastLevel-1][0] + toastDecimal*(colorA[toastLevel][0]-colorA[toastLevel-1][0]);
+      let mixedG = colorA[toastLevel-1][1] + toastDecimal*(colorA[toastLevel][1]-colorA[toastLevel-1][1]);
+      let mixedB = colorA[toastLevel-1][2] + toastDecimal*(colorA[toastLevel][2]-colorA[toastLevel-1][2]);
+
+      mixedColor = "#" + (1 << 24 | mixedR << 16 | mixedG << 8 | mixedB).toString(16).slice(1);
+    }
+  }
+
+  let imageUrl = '';
+  const handleFileChange = (event) => {
+      imageUrl = URL.createObjectURL(event.target.files[0]);
+      document.getElementById("top-image").src = imageUrl;
+  };
+
+  let imageUploadButton;
+  const triggerFileInput = () => {
+      imageUploadButton.click();
+    };
 </script>
 
 <div class="page">
@@ -205,7 +258,13 @@
     <!-- Display area for selected item outline -->
     <div class="display-section">
       <h3>Toasting: {selectedItem}</h3>
-      <img src={itemImages[selectedItem][toastLevel]} alt="{selectedItem} at toast level {toastLevel}" class="item-outline" />
+      <div id = "image-stack">
+        <!--<img src={itemImages[selectedItem][toastLevel]} alt="{selectedItem} at toast level {toastLevel}" class="item-outline" id = "bottom-image"/>-->
+        <img src={itemImages[selectedItem][toastLevel]} alt="{selectedItem} at toast level {toastLevel}" class="item-outline" id = "bottom-image"/>
+        <img src = "transparent.png" class = "item-outline" id = "top-image">
+      </div>
+      <!--do not modify, this helps with the layout-->
+      <img src = "transparent.png" style = "width: 120px; height: auto; opacity: 0%;">
     </div>
 
     <!-- Toast level slider -->
@@ -216,9 +275,10 @@
         type="range"
         min="1"
         max="6"
-        bind:value={toastLevel}
-        step="1"
-        style="--value: {(toastLevel - 1) / 5}"
+        on:input={updateToastLevel}
+        value={toastLevel}
+        step=".01"
+        style="--value: {(Math.floor(toastLevel) - 1) / 5};"
       />
     </div>
 
@@ -230,6 +290,11 @@
       <button on:click={startToasting}>Start Toasting</button>
       <button on:click={stopToasting}>Stop Toasting</button>
     </div>
+
+    {#if selectedItem === "Bread"}
+      <input type="file" bind:this={imageUploadButton} on:change={handleFileChange} accept="image/*" style="display: none;"/>
+      <button on:click={triggerFileInput}>Upload Image</button>
+    {/if}
 
     <!-- Progress Bar -->
     <div class="progress-bar-container">
@@ -348,10 +413,30 @@
   }
 
   .item-outline {
-    width: 120px;
     height: auto;
     margin-top: 10px;
     border-radius: 8px;
+    position: absolute;
+  }
+  
+  #image-stack{
+    position: relative;
+  }
+
+  #bottom-image{
+    width: 120px;
+    z-index: 0;
+    top: 0;
+    left: 0;
+  }
+
+  #top-image{
+    width: 60px;
+    z-index: 10;
+    opacity: 0;
+    top: 30px;
+    left: 25%;
+    filter: grayscale(1);
   }
 
   /* Toast Level Slider */
@@ -366,30 +451,37 @@
     margin-top: 5px;
     appearance: none;
     height: 8px;
-    background: linear-gradient(
+    background-image: linear-gradient(
       to right,
-      #007bff 0%,
-      #007bff calc(var(--value) * 100%),
-      #ddd calc(var(--value) * 100%),
-      #ddd 100%
+      white, 
+      #EFE4B0, 
+      #F2A072, 
+      #B97A57, 
+      #4F3426, 
+      black
     );
+    border: 2px solid #007bff; 
     border-radius: 5px;
     outline: none;
   }
 
   input[type="range"]::-webkit-slider-thumb {
     appearance: none;
-    width: 20px;
-    height: 20px;
-    background-color: #007bff;
+    width: 10px;
+    height: 10px;
+    background-color: transparent;
+    padding: 4px;
+    border: 4px solid #007bff;
     border-radius: 50%;
     cursor: pointer;
   }
 
   input[type="range"]::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background-color: #007bff;
+    width: 10px;
+    height: 10px;
+    background-color: transparent;
+    padding: 4px;
+    border: 4px solid #007bff;
     border-radius: 50%;
     cursor: pointer;
   }
