@@ -1,13 +1,25 @@
 <script>
     export let show = false;
+    export let showInfo = false;
     export let title = '';
     export let onClose = () => {};
-  </script>
+</script>
   
   {#if show}
     <div class="modal-overlay" on:click={onClose}>
       <div class="modal" on:click|stopPropagation>
         <h2>{title}</h2>
+        <div class="modal-content">
+          <slot></slot>
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  {#if showInfo}
+    <div class="modal-overlay" on:click={onClose}>
+      <div class="modal" on:click|stopPropagation>
+        <h2>Controls Info</h2>
         <div class="modal-content">
           <slot></slot>
         </div>
