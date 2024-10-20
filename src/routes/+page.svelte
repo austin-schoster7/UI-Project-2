@@ -17,7 +17,10 @@
 	let toastRemoved = false;
   let showInfoModal = false;
   let showModal = false;
-
+  let temperature = 0;
+  let calories = 0;
+  let toastLevelArray = [];
+  let avgToastLevel = 0;
 
 	// Item options for the toaster
 	const items = ['Bread', 'Bagel', 'Waffle', 'Pastry'];
@@ -82,10 +85,31 @@
       targetLevel = toastLevel;
       toastLevel = 1;
 
+      // Update average toast level
+      toastLevelArray.push(targetLevel);
+      let total = 0;
+      toastLevelArray.forEach((level) => {
+        total += level;
+        avgToastLevel = total / toastLevelArray.length;
+      });
+
+      // Update calories based on selected item
+      if (selectedItem === 'Bread') {
+        calories += 80;
+      } else if (selectedItem === 'Bagel') {
+        calories += 245;
+      } else if (selectedItem === 'Waffle') {
+        calories += 218;
+      } else if (selectedItem === 'Pastry') {
+        calories += 300;
+      }
+
       countdownInterval = setInterval(() => {
         if (elapsedTime < totalTime) {
           elapsedTime++;
           progress = (elapsedTime / totalTime) * 100; // Update progress
+          // Update temperature based on progress
+          temperature = updateTemperature(progress / 100);
         } else {
           stopToasting(); // Stop once elapsedTime reaches totalTime
           startReheatCountdown(); // Start the reheat countdown when toasting stops
@@ -99,6 +123,13 @@
       stopToasting();
     }
   };
+
+  // Function to simulate temperature
+  function updateTemperature(progress) {
+    // Assume temperature rises from 100 to 250 degrees as toast progresses
+    let temp = 100 + (150 * progress);
+    return temp > 250 ? 250 : temp; // Cap temperature at 250 degrees
+  }
 
   // Function to stop toasting and clear countdown
   const stopToasting = () => {
@@ -269,7 +300,16 @@
 			<button on:click={removeToast}>Remove Toast</button>
 		{/if}
 
-    <p>Toasts made today: {toastCount}</p>
+
+    <!-- Statistics -->
+    <div class="stats">
+      <h3>Statistics</h3>
+      <p>Toasts made today: {toastCount}</p>
+      <p>Temperature: {Math.round(temperature)} °F</p>
+      <p>Elapsed Time: {Math.round(elapsedTime)} s</p>
+      <p>Total calories: {calories}</p>
+      <p>Average Toast Level: {avgToastLevel.toFixed(2)}</p>
+    </div>
   </div>
   
   <!-- Testing UI -->
