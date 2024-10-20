@@ -15,9 +15,8 @@
 	let reheatActive = false;
 	let reheatModeTime = 0;
 	let toastRemoved = false;
-  let showInfoModal = false;
-  let showModal = false;
-
+	let showInfoModal = false;
+	let showModal = false;
 
 	// Item options for the toaster
 	const items = ['Bread', 'Bagel', 'Waffle', 'Pastry'];
@@ -72,45 +71,44 @@
 		}
 	};
 
-  // Function to start toasting and begin countdown
-  const startStopToasting = () => {
-    if (!toasting) {
-      toasting = !toasting;
-      remainingTime = toastLevel * 30; // Simulated time based on toast level
-      const totalTime = remainingTime;
-      elapsedTime = 0; // Reset elapsed time
-      targetLevel = toastLevel;
-      toastLevel = 1;
+	// Function to start toasting and begin countdown
+	const startStopToasting = () => {
+		if (!toasting) {
+			toasting = !toasting;
+			remainingTime = toastLevel * 30; // Simulated time based on toast level
+			const totalTime = remainingTime;
+			elapsedTime = 0; // Reset elapsed time
+			targetLevel = toastLevel;
+			toastLevel = 1;
 
-      countdownInterval = setInterval(() => {
-        if (elapsedTime < totalTime) {
-          elapsedTime++;
-          progress = (elapsedTime / totalTime) * 100; // Update progress
-        } else {
-          stopToasting(); // Stop once elapsedTime reaches totalTime
-          startReheatCountdown(); // Start the reheat countdown when toasting stops
-        }
-        if (targetLevel != toastLevel && elapsedTime % 30 === 0) {
-          toastLevel++;
-        }
-      }, 1000); // Increment every second
-    }
-    else {
-      stopToasting();
-    }
-  };
+			countdownInterval = setInterval(() => {
+				if (elapsedTime < totalTime) {
+					elapsedTime++;
+					progress = (elapsedTime / totalTime) * 100; // Update progress
+				} else {
+					stopToasting(); // Stop once elapsedTime reaches totalTime
+					startReheatCountdown(); // Start the reheat countdown when toasting stops
+				}
+				if (targetLevel != toastLevel && elapsedTime % 30 === 0) {
+					toastLevel++;
+				}
+			}, 1000); // Increment every second
+		} else {
+			stopToasting();
+		}
+	};
 
-  // Function to stop toasting and clear countdown
-  const stopToasting = () => {
-    if (toasting) {
-      toasting = !toasting;
-      clearInterval(countdownInterval);
-      progress = 0; // Reset progress bar
-      remainingTime = 0;
-      elapsedTime = 0;
-      toastCount++;
-    }
-  };
+	// Function to stop toasting and clear countdown
+	const stopToasting = () => {
+		if (toasting) {
+			toasting = !toasting;
+			clearInterval(countdownInterval);
+			progress = 0; // Reset progress bar
+			remainingTime = 0;
+			elapsedTime = 0;
+			toastCount++;
+		}
+	};
 
 	// Load profile settings based on user selection
 	const loadProfile = () => {
@@ -119,7 +117,7 @@
 		}
 	};
 
-  	// Function to show info modal
+	// Function to show info modal
 	const showInfo = () => {
 		showInfoModal = true; // Trigger info modal
 	};
@@ -131,7 +129,7 @@
 
 	const closeModal = () => {
 		showModal = false;
-    showInfoModal = false;
+		showInfoModal = false;
 	};
 
 	const loadFavoriteSettings = () => {
@@ -195,39 +193,53 @@
 <div class="page">
 	<!-- Device UI -->
 	<div class="device-ui">
-		<h2>Smart Toaster</h2>
-		<h3>Austin Schoster, Skyler Simpson, Joe Schnizer, Sam Winkelmann</h3>
-		<a href="https://sites.google.com/view/austin-schoster/cs5167-projects">Link to write up</a>
+		<div class="header-section">
+			<h2>Smart Toaster</h2>
+			<h3>Austin Schoster, Skyler Simpson, Joe Schnizer, Sam Winkelmann</h3>
+			<a href="https://sites.google.com/view/austin-schoster/cs5167-projects">Link to write up</a>
+		</div>
 
 		<br /><br />
 
-		<!-- User profile selection -->
-		<div class="profile-section">
-			<label>Select User: </label>
-			<select bind:value={selectedUser} on:change={loadProfile}>
-				<option value="">Select a user</option>
-				{#each Object.keys(profiles) as user}
-					<option value={user}>{user}</option>
-				{/each}
-			</select>
-		</div>
+		<div class="toaster-controls">
+			<!-- User profile selection -->
+			<div class="profile-section">
+				<label>Select User: </label>
+				<select bind:value={selectedUser} on:change={loadProfile}>
+					<option value="">Select a user</option>
+					{#each Object.keys(profiles) as user}
+						<option value={user}>{user}</option>
+					{/each}
+				</select>
+			</div>
 
-    <!-- Item selection dropdown -->
-    <div>
-      <label>Select Item to Toast: </label>
-      <select bind:value={selectedItem}>
-        {#each items as item}
-          <option value={item}>{item}</option>
-        {/each}
-      </select>
-    </div>
-    
-    <!-- Display area for selected item outline -->
-    <div class="display-section">
-      <h3>Toasting: {selectedItem}</h3>
-      <button class={!toasting ? 'startButton' : 'stopButton'} on:click={startStopToasting}>
-      <img src={itemImages[selectedItem][toastLevel]} alt="{selectedItem} at toast level {toastLevel}" class="item-outline" /><br>
-    </div>
+			<!-- Item selection dropdown -->
+			<div>
+				<label>Select Item to Toast: </label>
+				<select bind:value={selectedItem}>
+					{#each items as item}
+						<option value={item}>{item}</option>
+					{/each}
+				</select>
+			</div>
+
+			<!-- Display area for selected item outline -->
+			<div class="display-section">
+				<h3>Toasting: {selectedItem}</h3>
+				<button
+					class={!toasting ? 'startButton' : 'stopButton'}
+					on:click={startStopToasting}
+					disabled={reheatTimer > 0 || reheatActive}
+				>
+					<img
+						src={itemImages[selectedItem][toastLevel]}
+						alt="{selectedItem} at toast level {toastLevel}"
+						class="item-outline"
+					/><br />
+					{!toasting ? 'Start Toasting' : 'Stop Toasting'}
+				</button>
+			</div>
+		</div>
 
 		<!-- Toast level slider -->
 		<div class="toast-level">
@@ -243,12 +255,11 @@
 			/>
 		</div>
 
-    <!-- Toasting controls -->
-    <div>
-      <p>Time Remaining: {remainingTime - elapsedTime} seconds</p>
-    </div>
-    <div>
-    </div>
+		<!-- Toasting controls -->
+		<div>
+			<p>Time Remaining: {remainingTime - elapsedTime} seconds</p>
+		</div>
+		<div></div>
 
 		<!-- Progress Bar -->
 		<div class="progress-bar-container">
@@ -269,16 +280,16 @@
 			<button on:click={removeToast}>Remove Toast</button>
 		{/if}
 
-    <p>Toasts made today: {toastCount}</p>
-  </div>
-  
-  <!-- Testing UI -->
-  <div class="testing-ui">
-    <h2>Testing Controls</h2>
-    <button on:click={startStopToasting}>Simulate Start</button>
-    <button on:click={stopToasting}>Simulate Stop</button>
-    <button on:click={showInfo}>Info</button>
-  </div>
+		<p>Toasts made today: {toastCount}</p>
+	</div>
+
+	<!-- Testing UI -->
+	<div class="testing-ui">
+		<h2>Testing Controls</h2>
+		<button on:click={startStopToasting}>Simulate Start</button>
+		<button on:click={stopToasting}>Simulate Stop</button>
+		<button on:click={showInfo}>Info</button>
+	</div>
 
 	<div class="toaster-diagram">
 		<h2>Toaster Mockup</h2>
@@ -287,28 +298,35 @@
 </div>
 
 <!-- Modal for Profile Settings -->
-<Modal bind:show={showModal} bind:showInfo={showInfoModal} title="Load Settings for {selectedUser}" onClose={closeModal}>
-  {#if showModal}
-    <p>Select settings to load:</p>
-    <div class="modal-buttons">
-      <button on:click={loadFavoriteSettings}>Favorite</button>
-      <button on:click={loadPreviousSettings}>Previous</button>
-      <button on:click={loadBlankSettings}>Blank</button>
-    </div>
-  {:else if showInfoModal}
-    <p>
-      All the controls for simulating the smart toaster are included in the UI design rather than being incorporated in a separate
-      testing interface. The toast icon acts as a button and initiates the toasting process. It also stops toasting after a second press.
-      The "Simulate Start" and "Simulate Stop" buttons also perform the same functions outside the toaster's physical interface.
-      The "Info" button provides additional information about the controls and their functionalities. The user can select a profile to load
-      settings for the toaster, including the item to toast and the desired toast level. The toaster's progress is displayed through a
-      progress bar, and the user can remove the toast or activate reheat mode when the toasting process is complete. The UI also includes
-      a toaster mockup for visual reference.
-    </p>
-    <div class="modal-buttons">
-      <button on:click={closeModal}>Close</button>
-    </div>
-  {/if}
+<Modal
+	bind:show={showModal}
+	bind:showInfo={showInfoModal}
+	title="Load Settings for {selectedUser}"
+	onClose={closeModal}
+>
+	{#if showModal}
+		<p>Select settings to load:</p>
+		<div class="modal-buttons">
+			<button on:click={loadFavoriteSettings}>Favorite</button>
+			<button on:click={loadPreviousSettings}>Previous</button>
+			<button on:click={loadBlankSettings}>Blank</button>
+		</div>
+	{:else if showInfoModal}
+		<p>
+			All the controls for simulating the smart toaster are included in the UI design rather than
+			being incorporated in a separate testing interface. The toast icon acts as a button and
+			initiates the toasting process. It also stops toasting after a second press. The "Simulate
+			Start" and "Simulate Stop" buttons also perform the same functions outside the toaster's
+			physical interface. The "Info" button provides additional information about the controls and
+			their functionalities. The user can select a profile to load settings for the toaster,
+			including the item to toast and the desired toast level. The toaster's progress is displayed
+			through a progress bar, and the user can remove the toast or activate reheat mode when the
+			toasting process is complete. The UI also includes a toaster mockup for visual reference.
+		</p>
+		<div class="modal-buttons">
+			<button on:click={closeModal}>Close</button>
+		</div>
+	{/if}
 </Modal>
 
 <style>
@@ -431,22 +449,59 @@
 		cursor: pointer;
 	}
 
+	button:disabled {
+		background-color: grey;
+		cursor: not-allowed;
+		opacity: 0.6;
+	}
+
 	/* Progress Bar */
 	.progress-bar-container {
 		width: 100%;
+		max-width: 100%;
 		height: 20px;
 		background-color: #e0e0e0;
 		border-radius: 10px;
 		overflow: hidden;
 		margin-top: 20px;
 		position: relative;
+		box-sizing: border-box;
 	}
 
 	.progress-bar {
 		height: 100%;
 		background-color: #28a745;
 		transition: width 1s linear;
+		width: 0%; /* Initialize with no progress */
 		border-radius: 10px;
+		min-width: 1px; /* Ensure the progress bar is always visible even if it's very small */
+	}
+
+	/* Header Section Styling */
+	.header-section {
+		background-color: #008080; /* Teal background */
+		border-radius: 12px; /* Rounded edges */
+		padding: 20px; /* Spacing inside the box */
+		text-align: center; /* Center-align the text */
+		margin-bottom: 20px; /* Add space below the box */
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+	}
+
+	/* Headers inside the header section */
+	.header-section h2,
+	.header-section h3 {
+		color: white; /* Set title and names color to white for contrast */
+		margin-top: 7px;
+	}
+
+	/* Styling for the link inside the header section */
+	.header-section a {
+		color: #f0f0f5; /* Light color for the link */
+		text-decoration: underline; /* Underline the link */
+	}
+
+	.header-section a:hover {
+		color: #0c22c7; /* Lighter teal when hovering over the link */
 	}
 
 	/* Flashing red animation for reheat mode */
@@ -464,7 +519,8 @@
 
 	/* Apply the flashing red animation in reheat mode */
 	.reheat-mode {
-		animation: flashRed 1s infinite; /* Flash every second */
+		animation: flashRed 1s infinite;
+		min-width: 1px; /* Ensure the bar is always visible in reheat mode */
 	}
 
 	/* Buttons */
@@ -486,41 +542,66 @@
 		box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
 	}
 
-  button:active {
-    background-color: #004494;
-  }
+	button:active {
+		background-color: #004494;
+	}
 
-  .startButton {
-    background-color: rgb(0, 181, 0);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s, box-shadow 0.3s;
-  }
+	.startButton {
+		background-color: rgb(0, 181, 0);
+		color: white;
+		border: none;
+		border-radius: 8px;
+		padding: 10px 20px;
+		font-size: 16px;
+		cursor: pointer;
+		transition:
+			background-color 0.3s,
+			box-shadow 0.3s;
+	}
 
-  .startButton:hover {
-    background-color: rgb(0, 129, 0);
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
-  }
+	.startButton:hover {
+		background-color: rgb(31, 107, 31);
+		box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+	}
 
-  .stopButton {
-    background-color: red;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s, box-shadow 0.3s;
-  }
+	.stopButton {
+		background-color: red;
+		color: white;
+		border: none;
+		border-radius: 8px;
+		padding: 10px 20px;
+		font-size: 16px;
+		cursor: pointer;
+		transition:
+			background-color 0.3s,
+			box-shadow 0.3s;
+	}
 
-  .stopButton:hover {
-    background-color: rgb(183, 0, 0);
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
-  }
+	.stopButton:hover {
+		background-color: rgb(183, 0, 0);
+		box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+	}
+
+	/* New styles for toaster controls */
+	.toaster-controls {
+		background-color: #2450a1; /* Dark blue background */
+		padding: 20px;
+		border-radius: 8px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 25%;
+		margin-bottom: 20px;
+	}
+
+	.toaster-controls label {
+		color: white; /* Make labels visible on dark background */
+	}
+
+	.toaster-controls select,
+	.toaster-controls button {
+		margin-top: 10px;
+	}
 
 	/* Responsive Layout */
 	@media (max-width: 768px) {
