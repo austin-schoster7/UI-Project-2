@@ -15,6 +15,9 @@
 	let reheatActive = false;
 	let reheatModeTime = 0;
 	let toastRemoved = false;
+  let showInfoModal = false;
+  let showModal = false;
+
 
 	// Item options for the toaster
 	const items = ['Bread', 'Bagel', 'Waffle', 'Pastry'];
@@ -32,9 +35,6 @@
 	};
 
 	let selectedUser = ''; // No user selected by default
-
-	// Modal control variables
-	let showModal = false;
 
 	// Mapping item names to their images for each toast level (1-6)
 	const itemImages = {
@@ -119,8 +119,19 @@
 		}
 	};
 
+  	// Function to show info modal
+	const showInfo = () => {
+		showInfoModal = true; // Trigger info modal
+	};
+
+	// Close the info modal
+	const closeInfoModal = () => {
+		showInfoModal = false;
+	};
+
 	const closeModal = () => {
 		showModal = false;
+    showInfoModal = false;
 	};
 
 	const loadFavoriteSettings = () => {
@@ -266,7 +277,7 @@
     <h2>Testing Controls</h2>
     <button on:click={startStopToasting}>Simulate Start</button>
     <button on:click={stopToasting}>Simulate Stop</button>
-    <button on:click={() => alert('Info about controls...')}>Info</button>
+    <button on:click={showInfo}>Info</button>
   </div>
 
 	<div class="toaster-diagram">
@@ -276,13 +287,28 @@
 </div>
 
 <!-- Modal for Profile Settings -->
-<Modal bind:show={showModal} title="Load Settings for {selectedUser}" onClose={closeModal}>
-	<p>Select settings to load:</p>
-	<div class="modal-buttons">
-		<button on:click={loadFavoriteSettings}>Favorite</button>
-		<button on:click={loadPreviousSettings}>Previous</button>
-		<button on:click={loadBlankSettings}>Blank</button>
-	</div>
+<Modal bind:show={showModal} bind:showInfo={showInfoModal} title="Load Settings for {selectedUser}" onClose={closeModal}>
+  {#if showModal}
+    <p>Select settings to load:</p>
+    <div class="modal-buttons">
+      <button on:click={loadFavoriteSettings}>Favorite</button>
+      <button on:click={loadPreviousSettings}>Previous</button>
+      <button on:click={loadBlankSettings}>Blank</button>
+    </div>
+  {:else if showInfoModal}
+    <p>
+      All the controls for simulating the smart toaster are included in the UI design rather than being incorporated in a separate
+      testing interface. The toast icon acts as a button and initiates the toasting process. It also stops toasting after a second press.
+      The "Simulate Start" and "Simulate Stop" buttons also perform the same functions outside the toaster's physical interface.
+      The "Info" button provides additional information about the controls and their functionalities. The user can select a profile to load
+      settings for the toaster, including the item to toast and the desired toast level. The toaster's progress is displayed through a
+      progress bar, and the user can remove the toast or activate reheat mode when the toasting process is complete. The UI also includes
+      a toaster mockup for visual reference.
+    </p>
+    <div class="modal-buttons">
+      <button on:click={closeModal}>Close</button>
+    </div>
+  {/if}
 </Modal>
 
 <style>
