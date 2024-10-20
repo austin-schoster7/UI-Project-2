@@ -316,11 +316,13 @@
 					on:click={startStopToasting}
 					disabled={reheatTimer > 0 || reheatActive}
 				>
-					<img
-						src={itemImages[selectedItem][toastLevel]}
-						alt="{selectedItem} at toast level {toastLevel}"
-						class="item-outline"
-					/><br />
+          <div id = "image-stack">
+            <img src={itemImages[selectedItem][toastLevel]} alt="{selectedItem} at toast level {toastLevel}" class="item-outline" id = "bottom-image"/>
+                  <img src = "transparent.png" class = "item-outline" id = "top-image">
+          </div>
+          <img src = "transparent.png" style = "width: 120px; height: auto; opacity: 0%;">
+          <br/>
+          <br/>
 					{!toasting ? 'Start Toasting' : 'Stop Toasting'}
 				</button>
 			</div>
