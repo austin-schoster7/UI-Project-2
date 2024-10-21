@@ -217,6 +217,7 @@
 		toastRemoved = true;
 		progress = 0; // Reset progress when toast is removed
     document.getElementById("top-image").src = "transparent.png";
+	document.getElementById("toastImage").innerHTML = "Add Image to Toast";
 	};
 
 	const activateReheatMode = () => {
@@ -267,6 +268,7 @@
   const handleFileChange = (event) => {
       imageUrl = URL.createObjectURL(event.target.files[0]);
       document.getElementById("top-image").src = imageUrl;
+	  document.getElementById("toastImage").innerHTML = "Image Added";
   };
 
   let imageUploadButton;
@@ -328,6 +330,12 @@
 			</div>
 		</div>
 
+		<br/>
+		{#if selectedItem === "Bread"}
+			<input type="file" bind:this={imageUploadButton} on:change={handleFileChange} accept="image/*" style="display: none;"/>
+			<button on:click={triggerFileInput} id = "toastImage">Add Image to Toast</button>
+		{/if}
+
     <!-- Toast level slider -->
     <div class="toast-level">
       <label for="toast-level-slider">Toast Level: {toastLevel}</label>
@@ -348,11 +356,6 @@
 			<p>Time Remaining: {remainingTime - elapsedTime} seconds</p>
 		</div>
 		<div></div>
-
-    {#if selectedItem === "Bread"}
-      <input type="file" bind:this={imageUploadButton} on:change={handleFileChange} accept="image/*" style="display: none;"/>
-      <button on:click={triggerFileInput}>Upload Image</button>
-    {/if}
 
 		<!-- Progress Bar -->
 		<div class="progress-bar-container">
