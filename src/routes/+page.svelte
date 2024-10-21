@@ -283,7 +283,7 @@
 		<div class="header-section">
 			<h2>Smart Toaster</h2>
 			<h3>Austin Schoster, Skyler Simpson, Joe Schnizer, Sam Winkelmann</h3>
-			<a href="https://sites.google.com/view/austin-schoster/cs5167-projects">Link to write up</a>
+			<a href="https://sites.google.com/view/austin-schoster/cs5167-projects/project-2">Link to write up</a>
 		</div>
 
 		<br /><br />
